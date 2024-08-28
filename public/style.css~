@@ -1,0 +1,14 @@
+html {
+  height: 100%;
+  width: 100%;
+}
+.fixed-object {
+    position: fixed;
+    padding: 5px;
+    font-size: medium;
+    background-color: #2b2d2f00;
+    color: #fff;
+    border-radius: 4px;
+    z-index: 1000;
+    text-decoration: none;
+}
