@@ -1,0 +1,74 @@
+[debug] [2024-08-29T00:56:53.254Z] ----------------------------------------------------------------------
+[debug] [2024-08-29T00:56:53.264Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy
+[debug] [2024-08-29T00:56:53.264Z] CLI Version:   13.15.4
+[debug] [2024-08-29T00:56:53.264Z] Platform:      darwin
+[debug] [2024-08-29T00:56:53.264Z] Node Version:  v20.11.1
+[debug] [2024-08-29T00:56:53.264Z] Time:          Wed Aug 28 2024 18:56:53 GMT-0600 (Mountain Daylight Time)
+[debug] [2024-08-29T00:56:53.264Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-08-29T00:56:53.349Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-08-29T00:56:53.350Z] > authorizing via signed-in user (ykgerona@gmail.com)
+[debug] [2024-08-29T00:56:53.351Z] [iam] checking project spinningbrat for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2024-08-29T00:56:53.352Z] > refreshing access token with scopes: []
+[debug] [2024-08-29T00:56:53.354Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2024-08-29T00:56:53.355Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-08-29T00:56:53.639Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2024-08-29T00:56:53.639Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-08-29T00:56:53.685Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/spinningbrat:testIamPermissions [none]
+[debug] [2024-08-29T00:56:53.685Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/spinningbrat:testIamPermissions x-goog-quota-user=projects/spinningbrat
+[debug] [2024-08-29T00:56:53.685Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/spinningbrat:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-08-29T00:56:53.888Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/spinningbrat:testIamPermissions 200
+[debug] [2024-08-29T00:56:53.888Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/spinningbrat:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-08-29T00:56:53.889Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/spinningbrat [none]
+[debug] [2024-08-29T00:56:54.172Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/spinningbrat 200
+[debug] [2024-08-29T00:56:54.173Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/spinningbrat {"projectId":"spinningbrat","projectNumber":"393980685352","displayName":"spinningbrat","name":"projects/spinningbrat","resources":{"hostingSite":"spinningbrat"},"state":"ACTIVE","etag":"1_83d1cdf5-1cd6-4da6-8ab9-bfcdcee8041b"}
+[info] 
+[info] === Deploying to 'spinningbrat'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2024-08-29T00:56:54.184Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/versions [none]
+[debug] [2024-08-29T00:56:54.184Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2024-08-29T00:56:55.630Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/versions 200
+[debug] [2024-08-29T00:56:55.630Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/versions {"name":"projects/393980685352/sites/spinningbrat/versions/ad2c273f1696843b","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[spinningbrat]: beginning deploy... 
+[info] i  hosting[spinningbrat]: found 7 files in public 
+[debug] [2024-08-29T00:56:55.646Z] [hosting] uploading with 200 concurrency
+[debug] [2024-08-29T00:56:55.656Z] [hosting] hash cache [cHVibGlj] stored for 7 files
+[debug] [2024-08-29T00:56:55.656Z] [hosting][hash queue][FINAL] {"max":4,"min":0,"avg":0.5714285714285714,"active":0,"complete":7,"success":7,"errored":0,"retried":0,"total":7,"elapsed":6}
+[debug] [2024-08-29T00:56:55.657Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/393980685352/sites/spinningbrat/versions/ad2c273f1696843b:populateFiles [none]
+[debug] [2024-08-29T00:56:55.657Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/393980685352/sites/spinningbrat/versions/ad2c273f1696843b:populateFiles {"files":{"/style.css~":"40aa1fb6f151c5a61fca1dd33e36f6a8be6d06381555c5d4297cd5e2c420def9","/style.css":"aad395b6427c691b58a26a76a912cdb357dd90d381b0227d7b82df67e747aa4a","/script.js~":"4bf0773fb28c5f8280c8bfe59c918f7ff04a30a2d80b19493392226f292b8c68","/script.js":"100974bbfd8ea7d9d43d425b4f02cbdb6743a522aa76a9dc3047d2fed3fa4943","/index.html~":"0da5d771da8474c7c7aa8561f6bbde1dc3c8f4cb364ea647e84ffd2b101b57fc","/404.html":"b6abfbdc894d37c260154e281499dc6415bb6ad76b32f01ef94dee93aa897ac4","/index.html":"3c227285fac4e6bd6ab2ea96605b6e526d108746c23bad2e31c387c480a79a95"}}
+[debug] [2024-08-29T00:56:56.067Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/393980685352/sites/spinningbrat/versions/ad2c273f1696843b:populateFiles 200
+[debug] [2024-08-29T00:56:56.067Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/393980685352/sites/spinningbrat/versions/ad2c273f1696843b:populateFiles {"uploadRequiredHashes":["3c227285fac4e6bd6ab2ea96605b6e526d108746c23bad2e31c387c480a79a95"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/spinningbrat/versions/ad2c273f1696843b/files"}
+[debug] [2024-08-29T00:56:56.068Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/spinningbrat/versions/ad2c273f1696843b/files/3c227285fac4e6bd6ab2ea96605b6e526d108746c23bad2e31c387c480a79a95 [none]
+[debug] [2024-08-29T00:56:56.068Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/spinningbrat/versions/ad2c273f1696843b/files/3c227285fac4e6bd6ab2ea96605b6e526d108746c23bad2e31c387c480a79a95 [stream]
+[debug] [2024-08-29T00:56:56.069Z] [hosting][populate queue][FINAL] {"max":413,"min":413,"avg":413,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":414}
+[debug] [2024-08-29T00:56:56.070Z] [hosting] uploads queued: 1
+[debug] [2024-08-29T00:56:56.627Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/spinningbrat/versions/ad2c273f1696843b/files/3c227285fac4e6bd6ab2ea96605b6e526d108746c23bad2e31c387c480a79a95 200
+[debug] [2024-08-29T00:56:56.627Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/spinningbrat/versions/ad2c273f1696843b/files/3c227285fac4e6bd6ab2ea96605b6e526d108746c23bad2e31c387c480a79a95 [stream]
+[debug] [2024-08-29T00:56:56.628Z] [hosting][upload queue][FINAL] {"max":560,"min":560,"avg":560,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":560}
+[info] ✔  hosting[spinningbrat]: file upload complete 
+[debug] [2024-08-29T00:56:56.630Z] [hosting] deploy completed after 996ms
+[debug] [2024-08-29T00:56:56.630Z] [
+  {
+    "config": {
+      "public": "public",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "site": "spinningbrat"
+    },
+    "version": "projects/393980685352/sites/spinningbrat/versions/ad2c273f1696843b"
+  }
+]
+[info] i  hosting[spinningbrat]: finalizing version... 
+[debug] [2024-08-29T00:56:56.634Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/versions/ad2c273f1696843b updateMask=status%2Cconfig
+[debug] [2024-08-29T00:56:56.634Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/versions/ad2c273f1696843b {"status":"FINALIZED","config":{}}
+[debug] [2024-08-29T00:56:57.298Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/versions/ad2c273f1696843b 200
+[debug] [2024-08-29T00:56:57.298Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/versions/ad2c273f1696843b {"name":"projects/393980685352/sites/spinningbrat/versions/ad2c273f1696843b","status":"FINALIZED","config":{},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2024-08-29T00:56:54.929264Z","createUser":{"email":"ykgerona@gmail.com"},"finalizeTime":"2024-08-29T00:56:57.338226Z","finalizeUser":{"email":"ykgerona@gmail.com"}}
+[debug] [2024-08-29T00:56:57.299Z] [hosting] finalized version for spinningbrat:[object Object]
+[info] ✔  hosting[spinningbrat]: version finalized 
+[info] i  hosting[spinningbrat]: releasing new version... 
+[debug] [2024-08-29T00:56:57.299Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/channels/live/releases versionName=projects%2F393980685352%2Fsites%2Fspinningbrat%2Fversions%2Fad2c273f1696843b
+[debug] [2024-08-29T00:56:57.299Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/spinningbrat/channels/live/releases {}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinning 3D Text</title>
+    <title>Charioteer</title>
     <style>
         body, html {
             margin: 0;
@@ -15,56 +15,226 @@
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let scene, camera, renderer, text;
+        let scene, camera, renderer, horse1, horse2, chariot, charioteer;
+        let backgroundMesh;
 
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x00ff00);
+
+            // Create dynamic background
+            const backgroundGeometry = new THREE.PlaneGeometry(1500, 1500);  // Increased size by 1.5x
+            const backgroundMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0 }
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    void main() {
+                        vUv = uv;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float time;
+                    varying vec2 vUv;
+                    void main() {
+                        float t = mod(time, 2.0);
+                        float y = mod(vUv.y + t, 1.0);
+                        vec3 skyBlue = vec3(0.53, 0.81, 0.92);
+                        vec3 black = vec3(0.0, 0.0, 0.1);
+                        vec3 color;
+                        if (t < 1.0) {
+                            color = mix(skyBlue, black, y);
+                        } else {
+                            color = mix(black, skyBlue, y);
+                        }
+                        gl_FragColor = vec4(color, 1.0);
+                    }
+                `
+            });
+            backgroundMesh = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+            backgroundMesh.position.z = -10;
+            scene.add(backgroundMesh);
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
+            camera.position.z = 15;
+            camera.position.y = 5;
+            camera.position.x = -5;
+            camera.lookAt(0, 0, 0);
 
             renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
-            const loader = new THREE.FontLoader();
-            loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
-                const geometry = new THREE.TextGeometry('brat', {
-                    font: font,
-                    size: 0.5,
-                    height: 0.1,
-                    curveSegments: 12,
-                    bevelEnabled: true,
-                    bevelThickness: 0.01,
-                    bevelSize: 0.005,
-                    bevelOffset: 0,
-                    bevelSegments: 5
-                });
-                const material = new THREE.MeshPhongMaterial({ color: 0x000000 });
-                text = new THREE.Mesh(geometry, material);
+            createHorses();
+            createChariot();
+            createStrings();
 
-                // Center the text
-                geometry.computeBoundingBox();
-                text.position.x = -(geometry.boundingBox.max.x - geometry.boundingBox.min.x) / 2;
-                text.position.y = -(geometry.boundingBox.max.y - geometry.boundingBox.min.y) / 2;
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
 
-                scene.add(text);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
 
-                const light = new THREE.PointLight(0xffffff, 1, 100);
-                light.position.set(0, 0, 10);
-                scene.add(light);
+            animate();
+        }
 
-                animate();
-            });
+        function createHorses() {
+            horse1 = createHorse();
+            horse2 = createHorse();
+            horse1.position.set(2, 0, 1);
+            horse2.position.set(2, 0, -1);
+            scene.add(horse1, horse2);
+        }
+
+        function createHorse() {
+            const horse = new THREE.Group();
+            const horseMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
+
+            // Body
+            const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.7, 2, 8);
+            const body = new THREE.Mesh(bodyGeometry, horseMaterial);
+            body.rotation.z = Math.PI / 2;
+            horse.add(body);
+
+            // Neck
+            const neckGeometry = new THREE.CylinderGeometry(0.3, 0.4, 1, 8);
+            const neck = new THREE.Mesh(neckGeometry, horseMaterial);
+            neck.position.set(1, 0.5, 0);
+            neck.rotation.z = -Math.PI / 4;
+            horse.add(neck);
+
+            // Head
+            const headGeometry = new THREE.SphereGeometry(0.35, 8, 8);
+            const head = new THREE.Mesh(headGeometry, horseMaterial);
+            head.position.set(1.6, 0.9, 0);
+            horse.add(head);
+
+            // Snout
+            const snoutGeometry = new THREE.BoxGeometry(0.5, 0.25, 0.3);
+            const snout = new THREE.Mesh(snoutGeometry, horseMaterial);
+            snout.position.set(1.9, 0.8, 0);
+            horse.add(snout);
+
+            // Legs
+            const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.2);
+            for (let i = 0; i < 4; i++) {
+                const leg = new THREE.Mesh(legGeometry, horseMaterial);
+                leg.position.y = -1;
+                leg.position.x = i < 2 ? 0.6 : -0.6;
+                leg.position.z = i % 2 === 0 ? 0.3 : -0.3;
+                horse.add(leg);
+            }
+
+            // Tail (updated position and rotation)
+            const tailGeometry = new THREE.CylinderGeometry(0.1, 0.02, 1.5, 8);
+            const tail = new THREE.Mesh(tailGeometry, horseMaterial);
+            tail.position.set(-1.2, 0.25, 0);
+            tail.rotation.z = Math.PI / 1.5;
+            horse.add(tail);
+
+            // Wings (updated to point upwards)
+            const wingShape = new THREE.Shape();
+            wingShape.moveTo(0, 0);
+            wingShape.lineTo(1.5, 0);
+            wingShape.lineTo(1.5, -1);
+            wingShape.lineTo(0, 0);
+            const wingGeometry = new THREE.ShapeGeometry(wingShape);
+            const wingMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, side: THREE.DoubleSide });
+
+            const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
+            const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
+            leftWing.position.set(-0.5, 1, 0.6);
+            rightWing.position.set(-0.5, 1, -0.6);
+            horse.add(leftWing, rightWing);
+
+            return horse;
+        }
+
+        function createChariot() {
+            chariot = new THREE.Group();
+            const chariotMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+
+            // Chariot body
+            const bodyGeometry = new THREE.BoxGeometry(1.5, 1, 1.5);
+            const body = new THREE.Mesh(bodyGeometry, chariotMaterial);
+            chariot.add(body);
+
+            // Wheels
+            const wheelGeometry = new THREE.TorusGeometry(0.3, 0.1, 8, 24);
+            const wheel1 = new THREE.Mesh(wheelGeometry, chariotMaterial);
+            const wheel2 = new THREE.Mesh(wheelGeometry, chariotMaterial);
+            wheel1.position.set(0, -0.5, 0.5);
+            wheel2.position.set(0, -0.5, -0.5);
+            chariot.add(wheel1, wheel2);
+
+            // Charioteer
+            charioteer = new THREE.Group();
+            const charioteerMaterial = new THREE.MeshPhongMaterial({ color: 0xFFD700 });
+
+            // Body
+            const torsoGeometry = new THREE.CylinderGeometry(0.2, 0.3, 0.8, 8);
+            const torso = new THREE.Mesh(torsoGeometry, charioteerMaterial);
+            torso.position.y = 0.4;
+            charioteer.add(torso);
+
+            // Head
+            const headGeometry = new THREE.SphereGeometry(0.2, 8, 8);
+            const head = new THREE.Mesh(headGeometry, charioteerMaterial);
+            head.position.y = 1;
+            charioteer.add(head);
+
+            chariot.add(charioteer);
+            chariot.position.set(-2, 0, 0);
+            scene.add(chariot);
+        }
+
+        function createStrings() {
+            const stringMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+
+            // String to horse1
+            const string1Geometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(-1.25, 0, 0),
+                new THREE.Vector3(2, 0, 1)
+            ]);
+            const string1 = new THREE.Line(string1Geometry, stringMaterial);
+
+            // String to horse2
+            const string2Geometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(-1.25, 0, 0),
+                new THREE.Vector3(2, 0, -1)
+            ]);
+            const string2 = new THREE.Line(string2Geometry, stringMaterial);
+
+            scene.add(string1, string2);
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            if (text) {
-                text.rotation.x += 0.01;
-                text.rotation.y += 0.01;
-            }
+
+            const time = Date.now() * 0.002;
+
+            // Update background shader (10x slower)
+            backgroundMesh.material.uniforms.time.value += 0.0001;
+
+            // Alternate bobbing for horses
+            horse1.position.y = Math.sin(time) * 0.5;
+            horse2.position.y = Math.sin(time + Math.PI) * 0.5;
+
+            // Chariot bobbing (average of the two horses)
+            const chariotBobHeight = (horse1.position.y + horse2.position.y) / 2;
+            chariot.position.y = chariotBobHeight;
+
+            // Wing flapping (adjusted for new wing position)
+            const wingAngle = Math.sin(Date.now() * 0.01) * Math.PI / 6;
+            horse1.children[8].rotation.x = -wingAngle;
+            horse1.children[9].rotation.x = wingAngle;
+            horse1.children[10].rotation.x = -wingAngle;
+            horse2.children[8].rotation.x = -wingAngle;
+            horse2.children[9].rotation.x = wingAngle;
+            horse2.children[10].rotation.x = -wingAngle;
+
             renderer.render(scene, camera);
         }
 

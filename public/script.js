@@ -1,114 +1,128 @@
-let scene, camera, renderer, text;
-let isSpinning = true;
+let scene, camera, renderer, horse1, horse2, leftWing1, rightWing1, leftWing2, rightWing2;
 
-function init() {
-    // Create scene
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x00ff00);  // Set green background
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB); // Sky blue background
 
-    // Create camera
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5;
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 15;
+            camera.position.y = 2;
+            camera.lookAt(0, 0, 0);
 
-    // Create renderer
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
 
-    // Create text
-    const loader = new THREE.FontLoader();
-    loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
-        const geometry = new THREE.TextGeometry('brat', {
-            font: font,
-            size: 0.5,
-            height: 0.1,
-            curveSegments: 12,
-            bevelEnabled: true,
-            bevelThickness: 0.01,
-            bevelSize: 0.005,
-            bevelOffset: 0,
-            bevelSegments: 5
-        });
-        const material = new THREE.MeshPhongMaterial({ color: 0x000000 });  // Set text color to black
-        text = new THREE.Mesh(geometry, material);
+            horse1 = createHorse();
+            horse2 = createHorse();
+            horse2.position.z = -5; // Position the second horse behind the first one
 
-        // Center the text
-        geometry.computeBoundingBox();
-        const centerOffset = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
-        text.position.x = centerOffset;
+            scene.add(horse1);
+            scene.add(horse2);
 
-        scene.add(text);
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
 
-        // Add lighting
-        const light = new THREE.PointLight(0xffffff, 1, 100);
-        light.position.set(0, 0, 10);
-        scene.add(light);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
 
-        // Start animation
-        animate();
-    });
+            animate();
+        }
 
-    // Add click event listener to the renderer's DOM element
-    renderer.domElement.addEventListener('click', onTextClick);
-}
+        function createHorse() {
+            const horse = new THREE.Group();
+            const horseMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
 
-function animate() {
-    requestAnimationFrame(animate);
+            // Body
+            const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.7, 2, 8);
+            const body = new THREE.Mesh(bodyGeometry, horseMaterial);
+            body.rotation.z = Math.PI / 2;
+            horse.add(body);
 
-    // Rotate text
-    if (text && isSpinning) {
-        text.rotation.x += 0.01;
-        text.rotation.y += 0.01;
-    }
+            // Neck
+            const neckGeometry = new THREE.CylinderGeometry(0.3, 0.4, 1, 8);
+            const neck = new THREE.Mesh(neckGeometry, horseMaterial);
+            neck.position.set(1, 0.5, 0);
+            neck.rotation.z = -Math.PI / 4;
+            horse.add(neck);
 
-    renderer.render(scene, camera);
-}
+            // Head
+            const headGeometry = new THREE.SphereGeometry(0.35, 8, 8);
+            const head = new THREE.Mesh(headGeometry, horseMaterial);
+            head.position.set(1.6, 0.9, 0);
+            horse.add(head);
 
-// Handle window resizing
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-}
+            // Snout
+            const snoutGeometry = new THREE.BoxGeometry(0.5, 0.25, 0.3);
+            const snout = new THREE.Mesh(snoutGeometry, horseMaterial);
+            snout.position.set(1.9, 0.8, 0);
+            horse.add(snout);
 
-function onTextClick() {
-    if (isSpinning) {
-        isSpinning = false;
-        blurAnimation().then(() => {
-            showModal();
-        });
-    } else {
-        isSpinning = true;
-        hideModal();
-    }
-}
-
-function blurAnimation() {
-    return new Promise((resolve) => {
-        let blur = 0;
-        const blurInterval = setInterval(() => {
-            blur += 0.1;
-            if (blur >= 5) {
-                clearInterval(blurInterval);
-                resolve();
+            // Legs
+            const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.2);
+            for (let i = 0; i < 4; i++) {
+                const leg = new THREE.Mesh(legGeometry, horseMaterial);
+                leg.position.y = -1;
+                leg.position.x = i < 2 ? 0.6 : -0.6;
+                leg.position.z = i % 2 === 0 ? 0.3 : -0.3;
+                horse.add(leg);
             }
-            text.material.userData.blurRadius = blur;
-            text.material.needsUpdate = true;
-        }, 20);
-    });
-}
 
-function showModal() {
-    const modal = document.getElementById('modal');
-    modal.classList.add('active');
-}
+            // Tail
+            const tailGeometry = new THREE.CylinderGeometry(0.1, 0.02, 1.5, 8);
+            const tail = new THREE.Mesh(tailGeometry, horseMaterial);
+            tail.position.set(-1.2, -0.2, 0);
+            tail.rotation.z = Math.PI / 3;
+            horse.add(tail);
 
-function hideModal() {
-    const modal = document.getElementById('modal');
-    modal.classList.remove('active');
-}
+            // Wings (triangular shape facing back)
+            const wingShape = new THREE.Shape();
+            wingShape.moveTo(0, 0);
+            wingShape.lineTo(1.5, 0);
+            wingShape.lineTo(1.5, 1);
+            wingShape.lineTo(0, 0);
+            const wingGeometry = new THREE.ShapeGeometry(wingShape);
+            const wingMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, side: THREE.DoubleSide });
 
-window.addEventListener('resize', onWindowResize, false);
+            const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
+            const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
+            leftWing.position.set(-0.5, 0.5, 0.6);
+            rightWing.position.set(-0.5, 0.5, -0.6);
+            horse.add(leftWing, rightWing);
 
-// Initialize the scene
-init();
+            // Store wing references
+            horse.userData = { leftWing, rightWing };
+
+            return horse;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = Date.now() * 0.001;
+
+            // Flap the wings up and down
+            const wingAngle1 = Math.sin(time * 10) * Math.PI / 6;
+            const wingAngle2 = Math.sin(time * 10 + Math.PI) * Math.PI / 6;
+
+            horse1.userData.leftWing.rotation.x = wingAngle1;
+            horse1.userData.rightWing.rotation.x = wingAngle1;
+            horse2.userData.leftWing.rotation.x = wingAngle2;
+            horse2.userData.rightWing.rotation.x = wingAngle2;
+
+            // Move the horses up and down alternately
+            horse1.position.y = Math.sin(time * 2) * 0.5;
+            horse2.position.y = Math.sin(time * 2 + Math.PI) * 0.5;
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        window.addEventListener('resize', onWindowResize, false);
+        init();
